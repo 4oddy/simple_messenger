@@ -1,5 +1,6 @@
 import socket
 from threading import Thread
+from ipaddress import ip_address
 
 
 class Client:
@@ -7,9 +8,22 @@ class Client:
         """ Initializing client socket
             Takes 3 arguments: name, host, port and max size of message
         """
+
+        try:
+            _ = ip_address(host)
+            self._host = host
+        except Exception as ex:
+            print(ex)
+        else:
+            try:
+                if isinstance(port, int) and 0 < port <= 65535:
+                    self._port = port
+                else:
+                    raise ValueError("This is not correct port!")
+            except ValueError as ex:
+                print(ex)
+
         self._name = name
-        self._host = host
-        self._port = port
         self._max_size = max_size
 
         self.__server = (self._host, self._port)
