@@ -4,6 +4,9 @@ from threading import Thread
 
 class Client:
     def __init__(self, name, host, port, max_size):
+        """ Initializing client socket
+            Takes 3 arguments: name, host, port and max size of message
+        """
         self._name = name
         self._host = host
         self._port = port
@@ -13,9 +16,10 @@ class Client:
 
         self.__client = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
-        self.__receiving_thread = Thread(target=self.receive)
+        self.__receiving_thread = Thread(target=self.__receive)
 
     def send_message(self, message):
+        """ Sends message to server """
         if message != self._name:
             message = f'[Nickname - {self._name}]: {message}'
         try:
@@ -23,12 +27,13 @@ class Client:
         except Exception as e:
             print(e)
 
-    def receive(self):
+    def __receive(self):
         while True:
             data, address = self.__client.recvfrom(self._max_size)
             print(data.decode('utf-8'))
 
     def start_work(self):
+        """ Starts work of client """
         self.send_message(self._name)
         self.__receiving_thread.start()
 

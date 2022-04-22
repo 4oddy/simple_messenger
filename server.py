@@ -1,14 +1,28 @@
 import time
 import socket
+from ipaddress import ip_address
 
 
 class Server:
     def __init__(self, host, port, max_size):
         """ Initializing server method
-            Takes 3 arguments: host, port, max size of message
+            Takes 3 arguments: host, port and max size of message
         """
-        self._host = host
-        self._port = port
+
+        try:
+            _ = ip_address(host)
+            self._host = host
+        except Exception as ex:
+            print(ex)
+        else:
+            try:
+                if isinstance(port, int) and 0 < port <= 65535:
+                    self._port = port
+                else:
+                    raise ValueError("This is not correct port!")
+            except ValueError as ex:
+                print(ex)
+
         self._max_size = max_size
 
         self.__clients = list()
@@ -20,16 +34,12 @@ class Server:
         self.__alert_new_client_default = '[{}][Nickname - {}]: Client {}-{} has connected'
 
     def start_server(self):
-        """Binds server after initializing
-           You need to use this method before server_forever method
-        """
+        """ Binds server after initializing """
         print(f'[{self.__get_now_local_time()}] - ({self._host}, {self._port}) Server has been started')
         self.__server.bind((self._host, self._port))
 
     def serve_forever(self):
-        """ Main loop of server
-            To use this method, you have to complete start_server() command
-        """
+        """ Main loop of server """
         while self.__running:
             try:
                 data, address = self.__server.recvfrom(self._max_size)
@@ -56,18 +66,19 @@ class Server:
                 self.__running = False
 
     def __send_message(self, address, message):
+        # sends message to all clients besides client who sent the message
         for client in self.__clients:
             if client != address:
                 self.__server.sendto(message, client)
 
     def __get_now_local_time(self):
+        # returns current time
         return time.strftime('%Y-%m-%d|%H:%M:%S', time.localtime())
 
 
 if __name__ == '__main__':
     import os
     import sys
-    from ipaddress import ip_address
     from colorama import init, Fore
 
     DEFAULT_MAX_SIZE = 1024
@@ -89,7 +100,7 @@ if __name__ == '__main__':
             try:
                 print(Fore.WHITE + 'Input your IP:')
                 ip = input()
-                ip_check = ip_address(ip)
+                _ = ip_address(ip)
                 break
             except Exception:
                 print('This is not correct IP!')
