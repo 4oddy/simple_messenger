@@ -17,10 +17,20 @@ class Server:
         self.__alert_new_client_default = '[{}][Nickname - {}]: Client {}-{} has connected'
 
     def start_server(self):
+        """Binds server after initializing
+           
+           You need to use this method before server_forever method
+           
+        """
         print(f'[{self.__get_now_local_time()}] - ({self._host}, {self._port}) Server has been started')
         self.__server.bind((self._host, self._port))
 
     def serve_forever(self):
+        """ Main loop of server
+            
+            To use this method, you have to complete start_server() command
+            
+        """
         while self.__running:
             try:
                 data, address = self.__server.recvfrom(self._max_size)
