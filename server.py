@@ -4,6 +4,9 @@ import socket
 
 class Server:
     def __init__(self, host, port, max_size):
+        """ Initializing server method
+            Takes 3 arguments: host, port, max size of message
+        """
         self._host = host
         self._port = port
         self._max_size = max_size
@@ -18,18 +21,14 @@ class Server:
 
     def start_server(self):
         """Binds server after initializing
-           
            You need to use this method before server_forever method
-           
         """
         print(f'[{self.__get_now_local_time()}] - ({self._host}, {self._port}) Server has been started')
         self.__server.bind((self._host, self._port))
 
     def serve_forever(self):
         """ Main loop of server
-            
             To use this method, you have to complete start_server() command
-            
         """
         while self.__running:
             try:
