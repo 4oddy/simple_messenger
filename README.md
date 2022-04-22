@@ -1,5 +1,5 @@
 # simple_messenger
-simple messenger written on python
+simple messenger written on python 3.10.0
 
 # how to start chatting?
 launch server.py and complete initializing and then connect clients by client.py
