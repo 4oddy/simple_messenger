@@ -1,6 +1,5 @@
 import socket
 from threading import Thread
-from ipaddress import ip_address
 
 
 class Client:
@@ -9,22 +8,14 @@ class Client:
             Takes 3 arguments: name, host, port and max size of message
         """
 
-        try:
-            _ = ip_address(host)
-            self._host = host
-        except Exception as ex:
-            print(ex)
+        if name.strip():
+            self._name = name
         else:
-            try:
-                if isinstance(port, int) and 0 < port <= 65535:
-                    self._port = port
-                else:
-                    raise ValueError("This is not correct port!")
-            except ValueError as ex:
-                print(ex)
+            raise ValueError('Name cannot be empty string')
 
-        self._name = name
-        self._max_size = max_size
+        self._host = host
+        self._port = int(port)
+        self._max_size = int(max_size)
 
         self.__server = (self._host, self._port)
 
@@ -34,12 +25,17 @@ class Client:
 
     def send_message(self, message):
         """ Sends message to server """
-        if message != self._name:
-            message = f'[Nickname - {self._name}]: {message}'
+        message = f'[Nickname - {self._name}]: {message}'
         try:
             self.__client.sendto(message.encode('utf-8'), self.__server)
-        except Exception as e:
-            print(e)
+        except Exception as ex:
+            print(ex)
+
+    def __send_initial_message(self):
+        try:
+            self.__client.sendto(self._name.encode('utf-8'), self.__server)
+        except Exception as ex:
+            print(ex)
 
     def __receive(self):
         while True:
@@ -48,7 +44,7 @@ class Client:
 
     def start_work(self):
         """ Starts work of client """
-        self.send_message(self._name)
+        self.__send_initial_message()
         self.__receiving_thread.start()
 
 
@@ -66,13 +62,11 @@ if __name__ == '__main__':
             max_size = int(data[2])
 
         while True:
-            try:
-                name = input('Input Nickname:')
-                if not name:
-                    raise ValueError()
+            name = input('Input nickname:')
+            if not name.strip():
+                print('Incorrect name!')
+            else:
                 break
-            except ValueError:
-                print('This is empty string!')
 
         client = Client(name, ip, port, max_size)
 
@@ -80,12 +74,10 @@ if __name__ == '__main__':
         print('Connect to server? [y/n]')
 
         while True:
-            try:
-                choice = input().lower()
-                if choice not in 'y n'.split():
-                    raise ValueError()
+            choice = input().lower()
+            if choice in 'yn':
                 break
-            except ValueError:
+            else:
                 print('Not correct choice!')
 
         if choice == 'y':

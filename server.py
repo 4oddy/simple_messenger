@@ -1,29 +1,16 @@
 import time
 import socket
-from ipaddress import ip_address
 
 
 class Server:
     def __init__(self, host, port, max_size):
         """ Initializing server method
-            Takes 3 arguments: host, port and max size of message
+            Takes 3 arguments: host, port and max size of message (bytes)
         """
 
-        try:
-            _ = ip_address(host)
-            self._host = host
-        except Exception as ex:
-            print(ex)
-        else:
-            try:
-                if isinstance(port, int) and 0 < port <= 65535:
-                    self._port = port
-                else:
-                    raise ValueError("This is not correct port!")
-            except ValueError as ex:
-                print(ex)
-
-        self._max_size = max_size
+        self._host = host
+        self._port = int(port)
+        self._max_size = int(max_size)
 
         self.__clients = list()
         self.__running = True
@@ -71,7 +58,8 @@ class Server:
             if client != address:
                 self.__server.sendto(message, client)
 
-    def __get_now_local_time(self):
+    @staticmethod
+    def __get_now_local_time():
         # returns current time
         return time.strftime('%Y-%m-%d|%H:%M:%S', time.localtime())
 
@@ -80,6 +68,7 @@ if __name__ == '__main__':
     import os
     import sys
     from colorama import init, Fore
+    from ipaddress import ip_address
 
     DEFAULT_MAX_SIZE = 1024
     FILE_NAME = 'settings.conf'
@@ -124,12 +113,10 @@ if __name__ == '__main__':
     print('Start server? [y/n]')
 
     while True:
-        try:
-            choice = input().lower()
-            if choice not in 'y n'.split():
-                raise ValueError()
+        choice = input().lower()
+        if choice in 'yn':
             break
-        except ValueError:
+        else:
             print('Not correct choice!')
 
     if choice == 'y':
